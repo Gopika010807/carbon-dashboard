@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Campus Carbon Footprint Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:white;
+}
+
+.header{
+    text-align:center;
+    padding:20px;
+    font-size:28px;
+    font-weight:bold;
+    background:rgba(0,0,0,0.3);
+    letter-spacing:1px;
+}
+
+.container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    padding:20px;
+}
+
+.card{
+    background:rgba(255,255,255,0.1);
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.4);
+    backdrop-filter:blur(10px);
+    text-align:center;
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card h2{
+    font-size:18px;
+    margin-bottom:10px;
+    color:#00f2fe;
+}
+
+.value{
+    font-size:28px;
+    font-weight:bold;
+}
+
+.section-title{
+    margin:20px;
+    font-size:22px;
+    font-weight:bold;
+    border-left:5px solid #00f2fe;
+    padding-left:10px;
+}
+
+.score-board{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+    padding:0 20px 20px;
+}
+
+.score-card{
+    background:linear-gradient(135deg,#00f2fe,#4facfe);
+    color:black;
+    padding:15px;
+    border-radius:12px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.tips{
+    background:rgba(255,255,255,0.1);
+    margin:20px;
+    padding:20px;
+    border-radius:15px;
+    line-height:1.6;
+}
+
+.footer{
+    text-align:center;
+    padding:15px;
+    background:rgba(0,0,0,0.3);
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+🌍 Campus Carbon Footprint Dashboard
+</div>
+
+<div class="container">
+    <div class="card">
+        <h2>🌡 Temperature</h2>
+        <div class="value" id="temp">-- °C</div>
+    </div>
+
+    <div class="card">
+        <h2>💧 Humidity</h2>
+        <div class="value" id="hum">-- %</div>
+    </div>
+
+    <div class="card">
+        <h2>⚡ Current</h2>
+        <div class="value" id="current">-- A</div>
+    </div>
+
+    <div class="card">
+        <h2>🔌 Power</h2>
+        <div class="value" id="power">-- W</div>
+    </div>
+
+    <div class="card">
+        <h2>🔋 Energy</h2>
+        <div class="value" id="energy">-- kWh</div>
+    </div>
+
+    <div class="card">
+        <h2>🌫 CO₂ Emission</h2>
+        <div class="value" id="co2">-- kg</div>
+    </div>
+</div>
+
+<div class="section-title">🏆 Class Carbon Score</div>
+
+<div class="score-board">
+    <div class="score-card" id="classA">Class A : 0 Points</div>
+    <div class="score-card" id="classB">Class B : 0 Points</div>
+    <div class="score-card" id="classC">Class C : 0 Points</div>
+</div>
+
+<div class="section-title">🌱 Sustainability Tips</div>
+
+<div class="tips">
+• Switch off lights & fans when not in use.<br>
+• Use LED bulbs instead of CFL.<br>
+• Promote cycling & carpooling.<br>
+• Install solar panels.<br>
+• Avoid unnecessary AC usage.<br>
+• Conduct green awareness programs.
+</div>
+
+<div class="footer">
+Real-Time Data Powered by ThingSpeak | Carbon Footprint Monitoring System
+</div>
+
+<script>
+const channelID = "YOUR_CHANNEL_ID";
+const readAPIKey = "YOUR_READ_API_KEY";
+
+function fetchData(){
+    fetch(`https://api.thingspeak.com/channels/${channelID}/feeds/last.json?api_key=${readAPIKey}`)
+    .then(response => response.json())
+    .then(data => {
+
+        let temp = data.field1;
+        let hum = data.field2;
+        let current = data.field3;
+        let power = data.field4;
+        let energy = data.field5;
+        let co2 = data.field6;
+
+        document.getElementById("temp").innerText = temp + " °C";
+        document.getElementById("hum").innerText = hum + " %";
+        document.getElementById("current").innerText = current + " A";
+        document.getElementById("power").innerText = power + " W";
+        document.getElementById("energy").innerText = energy + " kWh";
+        document.getElementById("co2").innerText = co2 + " kg";
+
+        // Score Logic (Lower CO2 = Higher Score)
+        let scoreA = 100 - parseFloat(co2);
+        let scoreB = 95 - parseFloat(co2);
+        let scoreC = 90 - parseFloat(co2);
+
+        document.getElementById("classA").innerText = "Class A : " + scoreA.toFixed(1) + " Points";
+        document.getElementById("classB").innerText = "Class B : " + scoreB.toFixed(1) + " Points";
+        document.getElementById("classC").innerText = "Class C : " + scoreC.toFixed(1) + " Points";
+    });
+}
+
+setInterval(fetchData,15000);
+fetchData();
+</script>
+
+</body>
+</html>
